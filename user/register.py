@@ -1,28 +1,27 @@
-import csv
 import re
 from getpass import getpass
 
 import bcrypt as bcrypt
 
+from user.repository import save
+
 STRONG_PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
 PASSWORD_INVALID_CHARACTERS_REGEX = "^(?=.*\\s)"
 
 
+# todo loop user over and over if password does not match requirements
 def register_user():
     name = input("Enter username: ")
     password = getpass()
     if verify_password(password):
-        save_user_to_db(name, hash_password(password.encode('utf8')))
+        save(name, hash_password(password.encode('utf8')))
 
 
-def save_user_to_db(*data):
-    with open('resources/db.csv', 'a') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([*data])
-        csvfile.close()
+def verify_username(username):
+    # todo invalid characters
+    pass
 
 
-# todo we should also check if file exists and write headers if not
 def verify_password(password):
     if re.search(PASSWORD_INVALID_CHARACTERS_REGEX, password) is not None:
         return False

@@ -1,7 +1,9 @@
 from user.register import register_user
+from user.repository import read
 
 if __name__ == '__main__':
     register_user()
+    read()
 
 #write and read from csv
 #register user (should write to csv)
