@@ -18,7 +18,7 @@ def register_user():
 
 
 def verify_username(username):
-    return re.search(INVALID_CHARACTERS_REGEX, username) is not None
+    return re.search(INVALID_CHARACTERS_REGEX, username) is None
 
 
 def verify_password(password):
