@@ -6,24 +6,23 @@ import bcrypt as bcrypt
 from user.repository import save
 
 STRONG_PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
-PASSWORD_INVALID_CHARACTERS_REGEX = "^(?=.*\\s)"
+INVALID_CHARACTERS_REGEX = "^(?=.*\\s)"
 
 
 # todo loop user over and over if password does not match requirements
 def register_user():
-    name = input("Enter username: ")
+    username = input("Enter username: ")
     password = getpass()
-    if verify_password(password):
-        save(name, hash_password(password.encode('utf8')))
+    if verify_password(password) and verify_username(username):
+        save(username, hash_password(password.encode('utf8')))
 
 
 def verify_username(username):
-    # todo invalid characters
-    pass
+    return re.search(INVALID_CHARACTERS_REGEX, username) is not None
 
 
 def verify_password(password):
-    if re.search(PASSWORD_INVALID_CHARACTERS_REGEX, password) is not None:
+    if re.search(INVALID_CHARACTERS_REGEX, password) is not None:
         return False
 
     return re.search(STRONG_PASSWORD_REGEX, password) is not None
