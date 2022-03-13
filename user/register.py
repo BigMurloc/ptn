@@ -14,7 +14,7 @@ def register_user():
     username = get_username()
     password = get_password()
 
-    save(username, hash_password(password.encode('utf8')))
+    save(username.lower(), hash_password(password.encode('utf8')))
 
 
 def get_username():
