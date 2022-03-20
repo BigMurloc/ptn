@@ -1,7 +1,7 @@
-from command import dispatch
+from user.service import list_all
 
 if __name__ == '__main__':
-    dispatch()
+    list_all()
 
 # write and read from csv
 # register user (should write to csv)
