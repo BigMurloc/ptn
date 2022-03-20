@@ -1,5 +1,6 @@
 import sys
 
+from user.login import login
 from user.register import register_user
 from user.service import list_all
 
@@ -31,10 +32,12 @@ def execute(command_index):
 
 functions = {
     'register': register_user,
-    'list_all': list_all
+    'login': login,
+    'list_all': list_all,
 }
 
 functions_required_number_of_args = {
     'register': 0,
+    'login': 1,
     'list_all': 0
 }

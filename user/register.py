@@ -9,12 +9,11 @@ STRONG_PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
 INVALID_CHARACTERS_REGEX = "^(?=.*\\s)"
 
 
-# todo loop user over and over if password does not match requirements
 def register_user():
     username = get_username()
     password = get_password()
 
-    save(username.lower(), hash_password(password.encode('utf8')))
+    save(username.lower(), hash_password(password.encode('utf8')).decode('utf-8'))
 
 
 def get_username():
@@ -58,4 +57,4 @@ def verify_password(password):
 
 
 def hash_password(password):
-    return bcrypt.hashpw(password, bcrypt.gensalt(12))
+    return bcrypt.hashpw(password, bcrypt.gensalt())

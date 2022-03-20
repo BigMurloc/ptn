@@ -46,7 +46,7 @@ def find_by_username(username):
 
         for row in reader:
             if row['username'] == username:
-                return User(row['username', row['password']])
+                return User(row['username'], row['password'])
 
         return None
 
