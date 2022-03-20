@@ -1,5 +1,8 @@
 import sys
 
+from user.register import register_user
+from user.service import list_all
+
 
 def dispatch():
     number_of_args = len(sys.argv)
@@ -26,20 +29,12 @@ def execute(command_index):
     functions[sys.argv[command_index]](*function_args)
 
 
-def one_value(a):
-    print(a)
-
-
-def two_value(a, b):
-    print(a, b)
-
-
 functions = {
-    'one_value': one_value,
-    'two_value': two_value
+    'register': register_user,
+    'list_all': list_all
 }
 
 functions_required_number_of_args = {
-    'one_value': 1,
-    'two_value': 2
+    'register': 0,
+    'list_all': 0
 }
