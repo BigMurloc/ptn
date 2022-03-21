@@ -34,7 +34,8 @@ def find_all():
         users = []
 
         for row in reader:
-            users.append(User(row['username'], row['password']))
+            if row['username'] != 'username':
+                users.append(User(row['username'], row['password']))
 
         return users
 
@@ -43,9 +44,8 @@ def find_by_username(username):
     with open(DB_PATH, 'r') as csvfile:
         fieldnames = ['username', 'password']
         reader = csv.DictReader(csvfile, fieldnames)
-
         for row in reader:
-            if row['username'] == username:
+            if compare_username(row['username'], username):
                 return User(row['username'], row['password'])
 
         return None
@@ -57,7 +57,7 @@ def is_username_unique(username):
         reader = csv.DictReader(csvfile, fieldnames)
 
         for row in reader:
-            if row['username'] == username:
+            if compare_username(row['username'], username):
                 return False
 
         return True
@@ -70,7 +70,7 @@ def delete_by_username(username):
         reader = csv.DictReader(read_file, fieldnames)
 
         for row in reader:
-            if row['username'] != username:
+            if not compare_username(row['username'], username):
                 filtered_users.append(row)
 
     with open(DB_PATH, 'w') as write_file:
@@ -79,3 +79,7 @@ def delete_by_username(username):
 
         for row in filtered_users:
             writer.writerow(row)
+
+
+def compare_username(u1, u2):
+    return u1.lower() == u2.lower()
