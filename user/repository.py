@@ -61,3 +61,21 @@ def is_username_unique(username):
                 return False
 
         return True
+
+
+def delete_by_username(username):
+    filtered_users = []
+    with open(DB_PATH, 'r') as read_file:
+        fieldnames = ['username', 'password']
+        reader = csv.DictReader(read_file, fieldnames)
+
+        for row in reader:
+            if row['username'] != username:
+                filtered_users.append(row)
+
+    with open(DB_PATH, 'w') as write_file:
+        fieldnames = ['username', 'password']
+        writer = csv.DictWriter(write_file, fieldnames)
+
+        for row in filtered_users:
+            writer.writerow(row)

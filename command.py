@@ -2,7 +2,8 @@ import sys
 
 from user.login import login
 from user.register import register_user
-from user.service import list_all
+from user.service import list_all, delete
+from user.user_state import UserState
 
 
 def dispatch():
@@ -34,10 +35,12 @@ functions = {
     'register': register_user,
     'login': login,
     'list_all': list_all,
+    'delete': delete
 }
 
 functions_required_number_of_args = {
     'register': 0,
     'login': 1,
-    'list_all': 0
+    'list_all': 0,
+    'delete': 1
 }

@@ -10,6 +10,7 @@ def login(username):
     user = find_by_username(username)
     raw_password = getpass()
     if verify_password(raw_password, user.password):
+        print('Login success!')
         UserState().is_logged_in = True
 
 
