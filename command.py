@@ -41,6 +41,6 @@ functions = {
 functions_required_number_of_args = {
     'register': 0,
     'login': 1,
-    'list_all': 0,
+    'list_all': 1,
     'delete': 1
 }
