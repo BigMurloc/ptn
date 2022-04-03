@@ -1,6 +1,5 @@
 import sys
 
-from user.register import register_user
 from user.user_service import UserService
 
 
@@ -30,7 +29,7 @@ def execute(command_index):
 
 
 functions = {
-    'register': register_user,
+    'register': UserService().register,
     'login': UserService().login,
     'list_all': UserService().list_all,
     'delete': UserService().delete
