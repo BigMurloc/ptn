@@ -1,6 +1,6 @@
 import re
 
-from repository.repository import Repository
+from user.repository.user_repository import UserRepository
 
 
 class UserGuard:
@@ -8,12 +8,15 @@ class UserGuard:
     __STRONG_PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
     __INVALID_CHARACTERS_REGEX = "^(?=.*\\s)"
 
+    def __init__(self, repository: UserRepository):
+        self.repository = repository
+
     def verify_username(self, username):
         if re.search(self.__INVALID_CHARACTERS_REGEX, username) is not None:
             print("Username contains invalid characters, please try again")
             return False
 
-        if Repository().is_username_unique(username) is False:
+        if self.repository.is_username_unique(username) is False:
             print("Username is already taken")
             return False
 

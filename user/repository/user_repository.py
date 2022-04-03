@@ -1,10 +1,10 @@
 import csv
 from os.path import exists
 
-from repository.user_model import User
+from user.repository.user_model import User
 
 
-class Repository:
+class UserRepository:
     __DB_PATH = 'resources/db.csv'
 
     def find_all(self):

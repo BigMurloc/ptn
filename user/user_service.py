@@ -1,8 +1,8 @@
 from getpass import getpass
 
 
-from repository.repository import Repository
-from repository.user_model import User
+from user.repository.user_repository import UserRepository
+from user.repository.user_model import User
 from user.user_state import UserState
 from user.password_manager import PasswordManager
 from user.user_guard import UserGuard
@@ -12,12 +12,11 @@ class UserService:
 
     def __init__(
             self,
-            repository: Repository,
-            user_guard: UserGuard,
+            repository: UserRepository,
             password_manager: PasswordManager
     ):
         self.repository = repository
-        self.user_guard = user_guard
+        self.user_guard = UserGuard(repository)
         self.password_manager = password_manager
 
     def register(self):
