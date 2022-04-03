@@ -1,10 +1,10 @@
 import re
 from getpass import getpass
 
-import bcrypt
 
 from repository.repository import Repository
 from user.user_state import UserState
+from user.password_manager import PasswordManager
 
 
 class UserService:
@@ -15,12 +15,14 @@ class UserService:
         username = self.get_username()
         password = self.get_password()
 
-        Repository().save(username.lower(), self.hash_password(password.encode('utf8')).decode('utf-8'))
+        hashed_password = PasswordManager().hash_password(password)
+
+        Repository().save(username.lower(), PasswordManager().decode(hashed_password))
 
     def login(self, username):
         user = Repository().find_by_username(username)
         raw_password = getpass()
-        if self.verify_password(raw_password, user.password):
+        if PasswordManager().verify_password(raw_password, user.password):
             print('Login success!')
             UserState().is_logged_in = True
         else:
@@ -42,9 +44,6 @@ class UserService:
             raise RuntimeError('You are not authorized to do this operation')
 
         Repository().delete_by_username(username)
-
-    def verify_password(self, raw_password, hashed_password):
-        return bcrypt.checkpw(raw_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
     def get_username(self):
         username = input("Enter username: ")
@@ -81,7 +80,4 @@ class UserService:
             return False
 
         return True
-
-    def hash_password(self, password):
-        return bcrypt.hashpw(password, bcrypt.gensalt())
 
