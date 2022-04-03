@@ -2,6 +2,7 @@ from getpass import getpass
 
 
 from repository.repository import Repository
+from repository.user_model import User
 from user.user_state import UserState
 from user.password_manager import PasswordManager
 from user.user_guard import UserGuard
@@ -25,7 +26,7 @@ class UserService:
 
         hashed_password = self.password_manager.hash_password(password)
 
-        self.repository.save(username.lower(), self.password_manager.decode(hashed_password))
+        self.repository.save(User(username.lower(), self.password_manager.decode(hashed_password)))
 
     def login(self, username):
         user = self.repository.find_by_username(username)

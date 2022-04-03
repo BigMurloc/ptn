@@ -1,11 +1,7 @@
 import csv
 from os.path import exists
 
-
-class User:
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
+from repository.user_model import User
 
 
 class Repository:
@@ -34,7 +30,7 @@ class Repository:
 
             return None
 
-    def save(self, username, hashed_password):
+    def save(self, user):
         should_write_headers = False
         if not exists(self.__DB_PATH):
             should_write_headers = True
@@ -46,7 +42,7 @@ class Repository:
             if should_write_headers:
                 writer.writeheader()
 
-            writer.writerow({'username': username, 'password': hashed_password})
+            writer.writerow({'username': user.username, 'password': user.password})
             csvfile.close()
 
     def delete_by_username(self, username):
