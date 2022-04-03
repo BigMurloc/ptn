@@ -4,19 +4,21 @@ from user.user_service import UserService
 
 
 class Dispatcher:
-    __functions = {
-        'register': UserService().register,
-        'login': UserService().login,
-        'list_all': UserService().list_all,
-        'delete': UserService().delete
-    }
 
-    __functions_required_number_of_args = {
-        'register': 0,
-        'login': 1,
-        'list_all': 1,
-        'delete': 1
-    }
+    def __init__(self, user_service: UserService):
+        self.user_service = user_service
+        self.__functions = {
+            'register': self.user_service.register,
+            'login': self.user_service.login,
+            'list_all': self.user_service.list_all,
+            'delete': self.user_service.delete
+        }
+        self.__functions_required_number_of_args = {
+            'register': 0,
+            'login': 1,
+            'list_all': 1,
+            'delete': 1
+        }
 
     def dispatch(self):
         number_of_args = len(sys.argv)
