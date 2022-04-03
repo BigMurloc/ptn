@@ -5,7 +5,7 @@ from user.repository.user_model import User
 
 
 class UserRepository:
-    __DB_PATH = 'resources/db.csv'
+    __DB_PATH = 'resources/user_db.csv'
 
     def find_all(self):
         with open(self.__DB_PATH, 'r') as csvfile:

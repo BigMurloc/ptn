@@ -9,4 +9,9 @@ class SingletonMeta(type):
 
 
 class UserState(metaclass=SingletonMeta):
+    username = None
     is_logged_in = False
+
+    def is_authenticated(self):
+        if self.username is None or self.is_logged_in is False:
+            raise RuntimeError('You are not authenticated!')

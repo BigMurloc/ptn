@@ -4,7 +4,7 @@ from getpass import getpass
 from user.repository.user_repository import UserRepository
 from user.repository.user_model import User
 from user.user_state import UserState
-from user.password_manager import PasswordManager
+from util.password_manager import PasswordManager
 from user.user_guard import UserGuard
 
 
@@ -33,13 +33,13 @@ class UserService:
         if self.password_manager.verify_password(raw_password, user.password):
             print('Login success!')
             UserState().is_logged_in = True
+            UserState().username = username
         else:
             UserState().is_logged_in = False
             print('Login failure')
 
     def list_all(self, dirty_filter):
-        if not UserState().is_logged_in:
-            raise RuntimeError('You are not authorized to do this operation')
+        UserState().is_authenticated()
 
         clean_filter = dirty_filter.replace("--", "")  # -- is basically required to provide empty filter
         users = self.repository.find_all()
@@ -49,8 +49,7 @@ class UserService:
                 print(user.username)
 
     def delete(self, username):
-        if not UserState().is_logged_in:
-            raise RuntimeError('You are not authorized to do this operation')
+        UserState().is_authenticated()
 
         self.repository.delete_by_username(username)
 

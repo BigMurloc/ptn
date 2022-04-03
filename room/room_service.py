@@ -1,0 +1,58 @@
+from getpass import getpass
+
+from room.repository.participant_model import Participant
+from room.repository.participant_repository import ParticipantRepository
+from room.repository.room_model import Room
+from room.repository.room_repository import RoomRepository
+from user.user_state import UserState
+from util.password_manager import PasswordManager
+
+
+class RoomService:
+
+    def __init__(
+            self,
+            room_repository: RoomRepository,
+            participant_repository: ParticipantRepository,
+            password_manager: PasswordManager
+    ):
+        self.room_repository = room_repository
+        self.participant_repository = participant_repository
+        self.password_manager = password_manager
+
+    def create(self):
+        UserState().is_authenticated()
+
+        print('Creating room...')
+        password = getpass('Enter room password: ')
+        hashed_password = self.password_manager.hash_password(password)
+
+        room = Room(UserState().username, self.password_manager.decode(hashed_password))
+        self.room_repository.save(room)
+        print(f"Room has been created with id {room.uuid}")
+
+    def join(self):
+        print('Entering room...')
+        room_id = input("Enter room id: ")
+        room: Room = self.room_repository.find_by_id(room_id)
+
+        password = getpass()
+
+        if self.password_manager.verify_password(password, room.password):
+            self.participant_repository.save(Participant(UserState().username, room_id))
+            print(f'Successfully entered the {room.uuid} room')
+        else:
+            raise RuntimeError('Password did not match')
+
+    def delete(self):
+        UserState().is_authenticated()
+
+        print('Deleting room...')
+        room_id = input("Enter room id: ")
+        room: Room = self.room_repository.find_by_id(room_id)
+
+        if room.owner == UserState().username:
+            self.room_repository.delete_by_id(room_id)
+            print(f'Successfully deleted the {room_id} room')
+        else:
+            raise RuntimeError('You are not owner of this room')
