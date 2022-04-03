@@ -2,7 +2,7 @@ import sys
 
 from user.login import login
 from user.register import register_user
-from user.service import list_all, delete
+from user.user_service import UserService
 from user.user_state import UserState
 
 
@@ -34,8 +34,8 @@ def execute(command_index):
 functions = {
     'register': register_user,
     'login': login,
-    'list_all': list_all,
-    'delete': delete
+    'list_all': UserService().list_all,
+    'delete': UserService().delete
 }
 
 functions_required_number_of_args = {
