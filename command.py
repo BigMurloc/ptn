@@ -2,15 +2,16 @@ import sys
 
 from user.user_service import UserService
 
+
 class Dispatcher:
-    functions = {
+    __functions = {
         'register': UserService().register,
         'login': UserService().login,
         'list_all': UserService().list_all,
         'delete': UserService().delete
     }
 
-    functions_required_number_of_args = {
+    __functions_required_number_of_args = {
         'register': 0,
         'login': 1,
         'list_all': 1,
@@ -22,15 +23,15 @@ class Dispatcher:
         command_index = 1
         command_index_registry = []
         while command_index < number_of_args:
-            self.functions[sys.argv[command_index]]  # check if exists in dict and throw error if does not.
+            self.__functions[sys.argv[command_index]]  # check if exists in dict and throw error if does not.
             command_index_registry.append(command_index)
-            command_index += self.functions_required_number_of_args[sys.argv[command_index]] + 1
+            command_index += self.__functions_required_number_of_args[sys.argv[command_index]] + 1
 
         for command_index in command_index_registry:
-            self.execute(command_index)
+            self.__execute(command_index)
 
-    def execute(self, command_index):
-        number_of_required_arguments = self.functions_required_number_of_args[sys.argv[command_index]]
+    def __execute(self, command_index):
+        number_of_required_arguments = self.__functions_required_number_of_args[sys.argv[command_index]]
 
         function_args = []
         incrementer = 1
@@ -38,4 +39,4 @@ class Dispatcher:
             function_args.append(sys.argv[command_index + incrementer])
             incrementer += 1
 
-        self.functions[sys.argv[command_index]](*function_args)
+        self.__functions[sys.argv[command_index]](*function_args)

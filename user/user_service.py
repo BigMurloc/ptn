@@ -10,8 +10,8 @@ from user.user_guard import UserGuard
 class UserService:
 
     def register(self):
-        username = self.get_username()
-        password = self.get_password()
+        username = self.__get_username()
+        password = self.__get_password()
 
         hashed_password = PasswordManager().hash_password(password)
 
@@ -43,13 +43,13 @@ class UserService:
 
         Repository().delete_by_username(username)
 
-    def get_username(self):
+    def __get_username(self):
         username = input("Enter username: ")
         while UserGuard().verify_username(username) is not True:
             username = input("Enter username: ")
         return username
 
-    def get_password(self):
+    def __get_password(self):
         password = getpass()
         while UserGuard().check_password_strength(password) is not True:
             password = getpass()
