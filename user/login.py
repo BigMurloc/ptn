@@ -2,12 +2,12 @@ from getpass import getpass
 
 import bcrypt
 
-from user.repository import find_by_username
+from repository.repository import Repository
 from user.user_state import UserState
 
 
 def login(username):
-    user = find_by_username(username)
+    user = Repository().find_by_username(username)
     raw_password = getpass()
     if verify_password(raw_password, user.password):
         print('Login success!')

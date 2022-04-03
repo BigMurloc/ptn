@@ -3,7 +3,7 @@ from getpass import getpass
 
 import bcrypt as bcrypt
 
-from user.repository import save, is_username_unique
+from repository.repository import Repository
 
 STRONG_PASSWORD_REGEX = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$"
 INVALID_CHARACTERS_REGEX = "^(?=.*\\s)"
@@ -13,7 +13,7 @@ def register_user():
     username = get_username()
     password = get_password()
 
-    save(username.lower(), hash_password(password.encode('utf8')).decode('utf-8'))
+    Repository().save(username.lower(), hash_password(password.encode('utf8')).decode('utf-8'))
 
 
 def get_username():
@@ -35,7 +35,7 @@ def verify_username(username):
         print("Username contains invalid characters, please try again")
         return False
 
-    if is_username_unique(username) is False:
+    if Repository().is_username_unique(username) is False:
         print("Username is already taken")
         return False
 
