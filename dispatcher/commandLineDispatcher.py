@@ -1,9 +1,10 @@
 import sys
 
+from dispatcher.abstract_dispatcher import AbstractDispatcher
 from user.user_service import UserService
 
 
-class Dispatcher:
+class CommandLineDispatcher(AbstractDispatcher):
 
     def __init__(self, user_service: UserService):
         self.user_service = user_service
