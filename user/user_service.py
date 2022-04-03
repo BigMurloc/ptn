@@ -32,8 +32,9 @@ class UserService:
         raw_password = getpass()
         if self.password_manager.verify_password(raw_password, user.password):
             print('Login success!')
-            self.password_manager.is_logged_in = True
+            UserState().is_logged_in = True
         else:
+            UserState().is_logged_in = False
             print('Login failure')
 
     def list_all(self, dirty_filter):
