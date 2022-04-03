@@ -1,5 +1,4 @@
-from command import dispatch
+from command import Dispatcher
 
 if __name__ == '__main__':
-    dispatch()
-# todo filtering (escaping username with quoting marks)
+    Dispatcher().dispatch()
