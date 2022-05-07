@@ -38,14 +38,13 @@ class UserService:
             UserState().is_logged_in = False
             print('Login failure')
 
-    def list_all(self, dirty_filter):
+    def list_all(self, user_filter):
         UserState().is_authenticated()
 
-        clean_filter = dirty_filter.replace("--", "")  # -- is basically required to provide empty filter
         users = self.repository.find_all()
 
         for user in users:
-            if clean_filter in user.username:
+            if user_filter is None or user_filter in user.username:
                 print(user.username)
 
     def delete(self, username):
