@@ -1,11 +1,10 @@
 from getpass import getpass
 
-
-from user.repository.user_repository import UserRepository
 from user.repository.user_model import User
+from user.repository.user_repository import UserRepository
+from user.user_guard import UserGuard
 from user.user_state import UserState
 from util.password_manager import PasswordManager
-from user.user_guard import UserGuard
 
 
 class UserService:
@@ -27,16 +26,15 @@ class UserService:
 
         self.repository.save(User(username.lower(), self.password_manager.decode(hashed_password)))
 
-    def login(self, username):
+    def login(self, username, password):
         user = self.repository.find_by_username(username)
-        raw_password = getpass()
-        if self.password_manager.verify_password(raw_password, user.password):
+        if self.password_manager.verify_password(password, user.password):
             print('Login success!')
             UserState().is_logged_in = True
             UserState().username = username
         else:
             UserState().is_logged_in = False
-            print('Login failure')
+            raise RuntimeError('Login failure')
 
     def list_all(self, user_filter):
         UserState().is_authenticated()
@@ -63,4 +61,3 @@ class UserService:
         while self.user_guard.check_password_strength(password) is not True:
             password = getpass()
         return password
-

@@ -31,12 +31,9 @@ class RoomService:
         self.room_repository.save(room)
         print(f"Room has been created with id {room.uuid}")
 
-    def join(self):
+    def join(self, room_id, password):
         print('Entering room...')
-        room_id = input("Enter room id: ")
         room: Room = self.room_repository.find_by_id(room_id)
-
-        password = getpass()
 
         if self.password_manager.verify_password(password, room.password):
             self.participant_repository.save(Participant(UserState().username, room_id))
@@ -44,11 +41,10 @@ class RoomService:
         else:
             raise RuntimeError('Password did not match')
 
-    def delete(self):
+    def delete(self, room_id):
         UserState().is_authenticated()
 
         print('Deleting room...')
-        room_id = input("Enter room id: ")
         room: Room = self.room_repository.find_by_id(room_id)
 
         if room.owner == UserState().username:
