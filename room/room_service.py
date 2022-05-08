@@ -1,6 +1,5 @@
 from getpass import getpass
 
-from room.repository.participant_model import Participant
 from room.repository.participant_repository import ParticipantRepository
 from room.repository.room_model import Room
 from room.repository.room_repository import RoomRepository
@@ -51,3 +50,6 @@ class RoomService:
             print(f'Successfully deleted the room with id {room_id}')
         else:
             raise RuntimeError('You are not owner of this room')
+
+    def set_active_topic(self, topic_name, room_id):
+        self.room_repository.set_active_topic(room_id, topic_name)

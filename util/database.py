@@ -20,6 +20,7 @@ def init_db(connection: Connection):
     cursor.execute("DROP TABLE IF EXISTS users")
     cursor.execute("DROP TABLE IF EXISTS room")
     cursor.execute("DROP TABLE IF EXISTS participant")
+    cursor.execute("DROP TABLE IF EXISTS topic")
 
     connection.commit()
 
@@ -35,8 +36,21 @@ def init_db(connection: Connection):
         "CREATE TABLE room ( "
         "id INTEGER PRIMARY KEY, "
         "owner INTEGER NOT NULL, "
-        "password TEXT NOT NULL,"
-        "FOREIGN KEY (owner) REFERENCES users(id)"
+        "password TEXT NOT NULL, "
+        "active_topic TEXT, "
+        "FOREIGN KEY (owner) REFERENCES users(id), "
+        "FOREIGN KEY (active_topic) REFERENCES topic(name) "
+        ") "
+    )
+
+    cursor.execute(
+        "CREATE TABLE topic ( "
+        "id INTEGER PRIMARY KEY, "
+        "room_id INTEGER REFERENCES room(id), "
+        "name TEXT, "
+        "description TEXT, "
+        "score INTEGER DEFAULT 0, "
+        "UNIQUE(room_id, name) "
         ") "
     )
 

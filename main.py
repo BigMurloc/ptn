@@ -32,8 +32,6 @@ def initialize_db(obj):
     init_db(obj['db'])
 
 
-# ----------------------USER-------------------
-
 @cli.group("user", help="Provide login and password")
 @click.option("--username", required=True)
 @click.password_option()
@@ -43,6 +41,9 @@ def user(obj, username, password):
         UserRepository(obj['db']),
         PasswordManager()
     ).login(username, password)
+
+
+# ----------------------USER-------------------
 
 
 @user.command()
@@ -65,8 +66,6 @@ def delete(obj, username):
     ).delete(username)
 
 
-# ----------------------ROOM------------------
-
 @user.command()
 @click.pass_obj
 def make_room(obj):
@@ -83,22 +82,6 @@ def make_room(obj):
 
 @user.command()
 @click.option("--room_id", required=True)
-@click.password_option("--room_password")
-@click.pass_obj
-def join_room(obj, room_id, room_password):
-    participant_repository = ParticipantRepository(obj['db'])
-    RoomService(
-        RoomRepository(
-            participant_repository,
-            obj['db']
-        ),
-        participant_repository,
-        PasswordManager()
-    ).join(room_id, room_password)
-
-
-@user.command()
-@click.option("--room_id", required=True)
 @click.pass_obj
 def delete_room(obj, room_id):
     participant_repository = ParticipantRepository(obj['db'])
@@ -110,6 +93,45 @@ def delete_room(obj, room_id):
         participant_repository,
         PasswordManager()
     ).delete(room_id)
+
+
+@user.group("room")
+@click.option("--room_id", required=True)
+@click.password_option("--room_password")
+@click.pass_obj
+def room(obj, room_id, room_password):
+    participant_repository = ParticipantRepository(obj['db'])
+    RoomService(
+        RoomRepository(
+            participant_repository,
+            obj['db']
+        ),
+        participant_repository,
+        PasswordManager()
+    ).join(room_id, room_password)
+
+
+# ----------------------ROOM------------------
+
+@room.command("create-topic", help="Creates a new room topic")
+def create_topic():
+    pass
+
+
+@room.command("delete-topic", help="Deletes room topic")
+def delete_topic():
+    pass
+
+
+@room.command("change-topic", help="Changes room topic")
+def change_topic():
+    pass
+
+
+@room.command("vote",
+              help="Votes for current room topic. Accepted values: 0, ½, 1, 2, 3, 5, 8, 13, 20, 50, 100, 200, -1, -2")
+def vote():
+    pass
 
 
 if __name__ == '__main__':
