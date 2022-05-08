@@ -24,14 +24,14 @@ class UserService:
 
         hashed_password = self.password_manager.hash_password(password)
 
-        self.repository.save(User(username.lower(), self.password_manager.decode(hashed_password)))
+        self.repository.save(username, self.password_manager.decode(hashed_password))
 
     def login(self, username, password):
         user = self.repository.find_by_username(username)
         if self.password_manager.verify_password(password, user.password):
             print('Login success!')
             UserState().is_logged_in = True
-            UserState().username = username
+            UserState().user = user
         else:
             UserState().is_logged_in = False
             raise RuntimeError('Login failure')
@@ -42,8 +42,8 @@ class UserService:
         users = self.repository.find_all()
 
         for user in users:
-            if user_filter is None or user_filter in user.username:
-                print(user.username)
+            if user_filter is None or user_filter in user.user:
+                print(user.user)
 
     def delete(self, username):
         UserState().is_authenticated()

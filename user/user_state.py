@@ -1,3 +1,6 @@
+from user.repository.user_model import User
+
+
 class SingletonMeta(type):
     _instances = {}
 
@@ -9,9 +12,9 @@ class SingletonMeta(type):
 
 
 class UserState(metaclass=SingletonMeta):
-    username = None
+    user: User = None
     is_logged_in = False
 
     def is_authenticated(self):
-        if self.username is None or self.is_logged_in is False:
+        if self.user is None or self.is_logged_in is False:
             raise RuntimeError('You are not authenticated!')

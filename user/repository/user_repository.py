@@ -1,77 +1,48 @@
-import csv
-from os.path import exists
+import sqlite3
+from sqlite3 import Connection
 
 from user.repository.user_model import User
 
 
 class UserRepository:
-    __DB_PATH = 'resources/user_db.csv'
+
+    def __init__(self, db_connection: Connection):
+        self.db_connection = db_connection
+        self.db_cursor = db_connection.cursor()
 
     def find_all(self):
-        with open(self.__DB_PATH, 'r') as csvfile:
-            fieldnames = ['username', 'password']
-            reader = csv.DictReader(csvfile, fieldnames)
+        self.db_cursor.execute("SELECT * FROM users")
 
-            users = []
+        user_tuples = self.db_cursor.fetchall()
+        users = []
 
-            for row in reader:
-                if row['username'] != 'username':
-                    users.append(User(row['username'], row['password']))
+        for user_tuple in user_tuples:
+            users.append(self.__user_tuple_mapper(user_tuple))
 
-            return users
+        return users
 
     def find_by_username(self, username):
-        with open(self.__DB_PATH, 'r') as csvfile:
-            fieldnames = ['username', 'password']
-            reader = csv.DictReader(csvfile, fieldnames)
-            for row in reader:
-                if self.__compare_username(row['username'], username):
-                    return User(row['username'], row['password'])
+        self.db_connection.row_factory = sqlite3.Row
+        self.db_cursor.execute(
+            "SELECT * FROM users WHERE username = ?", (username,)
+        )
 
-            return None
+        return self.__user_tuple_mapper(self.db_cursor.fetchone())
 
-    def save(self, user):
-        should_write_headers = False
-        if not exists(self.__DB_PATH):
-            should_write_headers = True
+    def save(self, username, password):
+        self.db_cursor.execute(
+            "INSERT INTO users (username, password) VALUES (?, ?)", (username, password)
+        )
 
-        with open(self.__DB_PATH, 'a') as csvfile:
-            fieldnames = ['username', 'password']
-            writer = csv.DictWriter(csvfile, fieldnames)
-
-            if should_write_headers:
-                writer.writeheader()
-
-            writer.writerow({'username': user.username, 'password': user.password})
-            csvfile.close()
+        self.db_connection.commit()
 
     def delete_by_username(self, username):
-        filtered_users = []
-        with open(self.__DB_PATH, 'r') as read_file:
-            fieldnames = ['username', 'password']
-            reader = csv.DictReader(read_file, fieldnames)
-
-            for row in reader:
-                if not self.__compare_username(row['username'], username):
-                    filtered_users.append(row)
-
-        with open(self.__DB_PATH, 'w') as write_file:
-            fieldnames = ['username', 'password']
-            writer = csv.DictWriter(write_file, fieldnames)
-
-            for row in filtered_users:
-                writer.writerow(row)
+        self.db_cursor.execute("DELETE FROM users WHERE username = ?", (username,))
+        self.db_connection.commit()
 
     def is_username_unique(self, username):
-        with open(self.__DB_PATH, 'r') as csvfile:
-            fieldnames = ['username', 'password']
-            reader = csv.DictReader(csvfile, fieldnames)
+        self.db_cursor.execute("SELECT * FROM users WHERE username = ? ", (username,))
+        return self.db_cursor.fetchone() is None
 
-            for row in reader:
-                if self.__compare_username(row['username'], username):
-                    return False
-
-            return True
-
-    def __compare_username(self, u1, u2):
-        return u1.lower() == u2.lower()
+    def __user_tuple_mapper(self, user_tuple):
+        return User(user_tuple[0], user_tuple[1], user_tuple[2])

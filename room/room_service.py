@@ -27,17 +27,15 @@ class RoomService:
         password = getpass('Enter room password: ')
         hashed_password = self.password_manager.hash_password(password)
 
-        room = Room(UserState().username, self.password_manager.decode(hashed_password))
-        self.room_repository.save(room)
-        print(f"Room has been created with id {room.uuid}")
+        self.room_repository.save(UserState().user.id, self.password_manager.decode(hashed_password))
 
     def join(self, room_id, password):
         print('Entering room...')
         room: Room = self.room_repository.find_by_id(room_id)
 
         if self.password_manager.verify_password(password, room.password):
-            self.participant_repository.save(Participant(UserState().username, room_id))
-            print(f'Successfully entered the {room.uuid} room')
+            self.participant_repository.save(UserState().user.id, room.id)
+            print(f'Successfully entered the room with id {room.id}')
         else:
             raise RuntimeError('Password did not match')
 
@@ -47,8 +45,9 @@ class RoomService:
         print('Deleting room...')
         room: Room = self.room_repository.find_by_id(room_id)
 
-        if room.owner == UserState().username:
+        if room.owner == UserState().user.id:
             self.room_repository.delete_by_id(room_id)
-            print(f'Successfully deleted the {room_id} room')
+            self.participant_repository.delete_by_room_id(room_id)
+            print(f'Successfully deleted the room with id {room_id}')
         else:
             raise RuntimeError('You are not owner of this room')

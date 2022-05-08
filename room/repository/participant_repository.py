@@ -1,60 +1,23 @@
-import csv
-from os.path import exists
+from sqlite3 import Connection
 
 from room.repository.participant_model import Participant
 
 
 class ParticipantRepository:
-    __DB_PATH = 'resources/participant_db'
-    __fieldnames = ['user_id', 'room_id']
+    def __init__(self, db_connection: Connection):
+        self.db_connection = db_connection
+        self.db_cursor = db_connection.cursor()
 
-    def save(self, participant: Participant):
-        should_write_headers = False
-        if not exists(self.__DB_PATH):
-            should_write_headers = True
+    def save(self, participant_id, room_id):
+        self.db_cursor.execute(
+            "INSERT INTO participant (user_id, room_id) VALUES (?, ?)", (participant_id, room_id)
+        )
 
-        with open(self.__DB_PATH, 'a') as csvfile:
-            writer = csv.DictWriter(csvfile, self.__fieldnames)
-
-            if should_write_headers:
-                writer.writeheader()
-
-            writer.writerow({
-                'user_id': participant.user_id,
-                'room_id': participant.room_id
-            })
-
-            csvfile.close()
-
-    def find_participants_by_room_id(self, room_id):
-        result = []
-
-        with open(self.__DB_PATH, 'r') as csvfile:
-            reader = csv.DictReader(csvfile, self.__fieldnames)
-
-            for row in reader:
-                if row['room_id'] == room_id:
-                    result.append(Participant(row['user_id'], row['room_id']))
-        csvfile.close()
-
-        return result
+        self.db_connection.commit()
 
     def delete_by_room_id(self, room_id):
-        filtered_participants = []
+        self.db_cursor.execute("DELETE FROM participant WHERE room_id = ?", (room_id,))
+        self.db_connection.commit()
 
-        with open(self.__DB_PATH, 'r') as read_file:
-            reader = csv.DictReader(read_file, self.__fieldnames)
-
-            for row in reader:
-                if row['room_id'] != room_id:
-                    filtered_participants.append(row)
-
-        read_file.close()
-
-        with open(self.__DB_PATH, 'w') as write_file:
-            writer = csv.DictWriter(write_file, self.__fieldnames)
-
-            for row in filtered_participants:
-                writer.writerow(row)
-
-        write_file.close()
+    def __participant_tuple_mapper(self, participant_tuple):
+        return Participant(participant_tuple[0], participant_tuple[1], participant_tuple[2])

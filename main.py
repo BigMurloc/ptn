@@ -5,22 +5,31 @@ from room.repository.room_repository import RoomRepository
 from room.room_service import RoomService
 from user.repository.user_repository import UserRepository
 from user.user_service import UserService
+from util.database import get_database, init_db
 from util.password_manager import PasswordManager
 
 
 @click.group()
-def cli():
-    pass
+@click.pass_context
+def cli(ctx):
+    ctx.obj = {'db': get_database()}
 
 
 # ----------------------CLI--------------------
 
 @cli.command(help="Register user")
-def register():
+@click.pass_obj
+def register(obj):
     UserService(
-        UserRepository(),
+        UserRepository(obj['db']),
         PasswordManager()
     ).register()
+
+
+@cli.command("init-db", help="Sets up a new database, erasing all the data")
+@click.pass_obj
+def initialize_db(obj):
+    init_db(obj['db'])
 
 
 # ----------------------USER-------------------
@@ -28,27 +37,30 @@ def register():
 @cli.group("user", help="Provide login and password")
 @click.option("--username", required=True)
 @click.password_option()
-def user(username, password):
+@click.pass_obj
+def user(obj, username, password):
     UserService(
-        UserRepository(),
+        UserRepository(obj['db']),
         PasswordManager()
     ).login(username, password)
 
 
 @user.command()
 @click.option("--filter")
-def list_all(filter):
+@click.pass_obj
+def list_all(obj, filter):
     UserService(
-        UserRepository(),
+        UserRepository(obj['db']),
         PasswordManager()
     ).list_all(filter)
 
 
 @user.command()
 @click.option("--username", required=True)
-def delete(username):
+@click.pass_obj
+def delete(obj, username):
     UserService(
-        UserRepository(),
+        UserRepository(obj['db']),
         PasswordManager()
     ).delete(username)
 
@@ -56,11 +68,13 @@ def delete(username):
 # ----------------------ROOM------------------
 
 @user.command()
-def make_room():
-    participant_repository = ParticipantRepository()
+@click.pass_obj
+def make_room(obj):
+    participant_repository = ParticipantRepository(obj['db'])
     RoomService(
         RoomRepository(
-            participant_repository
+            participant_repository,
+            obj['db']
         ),
         participant_repository,
         PasswordManager()
@@ -70,11 +84,13 @@ def make_room():
 @user.command()
 @click.option("--room_id", required=True)
 @click.password_option("--room_password")
-def join_room(room_id, room_password):
-    participant_repository = ParticipantRepository()
+@click.pass_obj
+def join_room(obj, room_id, room_password):
+    participant_repository = ParticipantRepository(obj['db'])
     RoomService(
         RoomRepository(
-            participant_repository
+            participant_repository,
+            obj['db']
         ),
         participant_repository,
         PasswordManager()
@@ -83,11 +99,13 @@ def join_room(room_id, room_password):
 
 @user.command()
 @click.option("--room_id", required=True)
-def delete_room(room_id):
-    participant_repository = ParticipantRepository()
+@click.pass_obj
+def delete_room(obj, room_id):
+    participant_repository = ParticipantRepository(obj['db'])
     RoomService(
         RoomRepository(
-            participant_repository
+            participant_repository,
+            obj['db']
         ),
         participant_repository,
         PasswordManager()
@@ -98,5 +116,4 @@ if __name__ == '__main__':
     cli()
 
 # TODO: increase readability of user prompts and command help descriptions
-# TODO: refactor commands to make it more aligned with @click (make use of passing the command context)
 # TODO: allow user to delete himself

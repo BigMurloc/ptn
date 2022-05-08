@@ -1,68 +1,30 @@
-import csv
-from os.path import exists
+from sqlite3 import Connection
 
 from room.repository.participant_repository import ParticipantRepository
 from room.repository.room_model import Room
 
 
 class RoomRepository:
-    __DB_PATH = 'resources/room_db.csv'
-    __fieldnames = ['uuid', 'owner', 'password']
-
-    def __init__(self, participant_repository: ParticipantRepository):
+    def __init__(
+            self,
+            participant_repository: ParticipantRepository,
+            db_connection: Connection
+    ):
         self.participant_repository = participant_repository
+        self.db_connection = db_connection
+        self.db_cursor = db_connection.cursor()
 
-    def save(self, room: Room):
-        should_write_headers = False
-        if not exists(self.__DB_PATH):
-            should_write_headers = True
-
-        with open(self.__DB_PATH, 'a') as csvfile:
-            writer = csv.DictWriter(csvfile, self.__fieldnames)
-
-            if should_write_headers:
-                writer.writeheader()
-
-            writer.writerow({
-                'uuid': room.uuid,
-                'owner': room.owner,
-                'password': room.password
-            })
-
-            csvfile.close()
+    def save(self, owner_id, password):
+        self.db_cursor.execute("INSERT INTO room (owner, password) VALUES (?, ?)", (owner_id, password))
+        self.db_connection.commit()
 
     def find_by_id(self, room_id):
-        with open(self.__DB_PATH, 'r') as csvfile:
-            reader = csv.DictReader(csvfile, self.__fieldnames)
-
-            for row in reader:
-                if row['uuid'] == room_id:
-                    return Room(
-                        row['owner'],
-                        row['password'],
-                        row['uuid'],
-                    )
-
-        return None
+        self.db_cursor.execute("SELECT * FROM room WHERE id = ? ", (room_id,))
+        return self.__room_tuple_mapper(self.db_cursor.fetchone())
 
     def delete_by_id(self, room_id):
-        filtered_rooms = []
+        self.db_cursor.execute("DELETE FROM room WHERE id = ? ", (room_id,))
+        self.db_connection.commit()
 
-        self.participant_repository.delete_by_room_id(room_id)
-
-        with open(self.__DB_PATH, 'r') as read_file:
-            reader = csv.DictReader(read_file, self.__fieldnames)
-
-            for row in reader:
-                if row['uuid'] != room_id:
-                    filtered_rooms.append(row)
-
-        read_file.close()
-
-        with open(self.__DB_PATH, 'w') as write_file:
-            writer = csv.DictWriter(write_file, self.__fieldnames)
-
-            for row in filtered_rooms:
-                writer.writerow(row)
-
-        write_file.close()
+    def __room_tuple_mapper(self, room_tuple):
+        return Room(room_tuple[0], room_tuple[1], room_tuple[2])
