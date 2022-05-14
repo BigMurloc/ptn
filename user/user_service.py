@@ -43,7 +43,7 @@ class UserService:
 
         for user in users:
             if user_filter is None or user_filter in user.user:
-                print(user.user)
+                print(user.username)
 
     def delete(self, username):
         UserState().is_authenticated()

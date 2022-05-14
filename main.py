@@ -2,7 +2,9 @@ import click
 
 from room.repository.participant_repository import ParticipantRepository
 from room.repository.room_repository import RoomRepository
+from room.repository.topic_repository import TopicRepository
 from room.room_service import RoomService
+from room.topic_service import TopicService
 from user.repository.user_repository import UserRepository
 from user.user_service import UserService
 from util.database import get_database, init_db
@@ -100,6 +102,7 @@ def delete_room(obj, room_id):
 @click.password_option("--room_password")
 @click.pass_obj
 def room(obj, room_id, room_password):
+    obj['room_id'] = room_id
     participant_repository = ParticipantRepository(obj['db'])
     RoomService(
         RoomRepository(
@@ -114,8 +117,13 @@ def room(obj, room_id, room_password):
 # ----------------------ROOM------------------
 
 @room.command("create-topic", help="Creates a new room topic")
-def create_topic():
-    pass
+@click.pass_obj
+def create_topic(obj):
+    TopicService(
+        TopicRepository(
+            obj['db']
+        )
+    ).create(obj['room_id'])
 
 
 @room.command("delete-topic", help="Deletes room topic")
