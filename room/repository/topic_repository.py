@@ -11,6 +11,9 @@ class TopicRepository:
             "INSERT INTO topic (room_id, name, description) VALUES (?, ?, ?)", (room_id, name, description)
         )
         self.db_connection.commit()
+        self.db_cursor.execute("SELECT id FROM topic WHERE room_id = ?", (room_id,))
+
+        return self.db_cursor.fetchone()[0]
 
     def delete(self, room_id):
         self.db_cursor.execute("DELETE FROM topic WHERE room_id = ?", (room_id,))

@@ -116,23 +116,28 @@ def room(obj, room_id, room_password):
 
 # ----------------------ROOM------------------
 
-@room.command("create-topic", help="Creates a new room topic")
+@room.command("change-topic", help="Creates a new room topic")
 @click.pass_obj
 def create_topic(obj):
     TopicService(
+        RoomService(
+            RoomRepository(
+                ParticipantRepository(obj['db']),
+                obj['db']
+            ),
+            ParticipantRepository(
+                obj['db']
+            ),
+            obj['db'],
+        ),
         TopicRepository(
             obj['db']
-        )
+        ),
     ).create(obj['room_id'])
 
 
 @room.command("delete-topic", help="Deletes room topic")
 def delete_topic():
-    pass
-
-
-@room.command("change-topic", help="Changes room topic")
-def change_topic():
     pass
 
 

@@ -26,10 +26,11 @@ class RoomRepository:
         self.db_cursor.execute("DELETE FROM room WHERE id = ? ", (room_id,))
         self.db_connection.commit()
 
+    def set_active_topic(self, topic_id, room_id):
+        self.db_cursor.execute(""
+                               "UPDATE room SET active_topic = ? WHERE id = ?", (topic_id, room_id))
+        self.db_connection.commit()
+
     def __room_tuple_mapper(self, room_tuple):
         return Room(room_tuple[0], room_tuple[1], room_tuple[2])
 
-    def set_active_topic(self, room_id, topic_name):
-        self.db_cursor.execute(""
-                               "UPDATE room SET active_topic = ? WHERE id = ?", (topic_name, room_id))
-        self.db_connection.commit()

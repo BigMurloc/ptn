@@ -51,5 +51,10 @@ class RoomService:
         else:
             raise RuntimeError('You are not owner of this room')
 
-    def set_active_topic(self, topic_name, room_id):
-        self.room_repository.set_active_topic(room_id, topic_name)
+    def is_owner(self, room_id):
+        room: Room = self.room_repository.find_by_id(room_id)
+
+        return room.owner == UserState().user.id
+
+    def set_active_topic(self, topic_id, room_id):
+        self.room_repository.set_active_topic(topic_id, room_id)

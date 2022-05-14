@@ -37,9 +37,9 @@ def init_db(connection: Connection):
         "id INTEGER PRIMARY KEY, "
         "owner INTEGER NOT NULL, "
         "password TEXT NOT NULL, "
-        "active_topic TEXT, "
+        "active_topic INTEGER, "
         "FOREIGN KEY (owner) REFERENCES users(id), "
-        "FOREIGN KEY (active_topic) REFERENCES topic(name) "
+        "FOREIGN KEY (active_topic) REFERENCES topic(id) "
         ") "
     )
 
@@ -50,7 +50,7 @@ def init_db(connection: Connection):
         "name TEXT, "
         "description TEXT, "
         "score INTEGER DEFAULT 0, "
-        "UNIQUE(room_id, name) "
+        "UNIQUE(room_id) "
         ") "
     )
 
