@@ -17,3 +17,4 @@ class TopicRepository:
 
     def delete(self, room_id):
         self.db_cursor.execute("DELETE FROM topic WHERE room_id = ?", (room_id,))
+        self.db_connection.commit()

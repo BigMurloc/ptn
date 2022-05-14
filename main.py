@@ -137,8 +137,23 @@ def create_topic(obj):
 
 
 @room.command("delete-topic", help="Deletes room topic")
-def delete_topic():
-    pass
+@click.pass_obj
+def delete_topic(obj):
+    TopicService(
+        RoomService(
+            RoomRepository(
+                ParticipantRepository(obj['db']),
+                obj['db']
+            ),
+            ParticipantRepository(
+                obj['db']
+            ),
+            obj['db'],
+        ),
+        TopicRepository(
+            obj['db']
+        ),
+    ).delete(obj['room_id'])
 
 
 @room.command("vote",
