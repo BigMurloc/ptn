@@ -3,6 +3,7 @@ from room.room_service import RoomService
 
 
 class TopicService:
+    __allowed_voting_values = [0, 0.5, 1, 2, 3, 5, 8, 13, 20, 50, 100, 200, -1, -2]
 
     def __init__(
             self,
@@ -22,6 +23,15 @@ class TopicService:
         self.topic_repository.delete(room_id)
         topic_id = self.topic_repository.save(room_id, name, description)
         self.room_service.set_active_topic(topic_id, room_id)
+
+    def vote(self, room_id, score):
+        if float(score) not in self.__allowed_voting_values:
+            print('Allowed voting values:')
+            for voting_value in self.__allowed_voting_values:
+                print(voting_value)
+            raise RuntimeError('Score not within allowed values')
+
+        self.topic_repository.vote(room_id, float(score))
 
     def delete(self, room_id):
         if not self.room_service.is_owner(room_id):

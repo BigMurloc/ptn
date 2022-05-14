@@ -158,8 +158,24 @@ def delete_topic(obj):
 
 @room.command("vote",
               help="Votes for current room topic. Accepted values: 0, ½, 1, 2, 3, 5, 8, 13, 20, 50, 100, 200, -1, -2")
-def vote():
-    pass
+@click.pass_obj
+@click.option("--score")
+def vote(obj, score):
+    TopicService(
+        RoomService(
+            RoomRepository(
+                ParticipantRepository(obj['db']),
+                obj['db']
+            ),
+            ParticipantRepository(
+                obj['db']
+            ),
+            obj['db'],
+        ),
+        TopicRepository(
+            obj['db']
+        ),
+    ).vote(obj['room_id'], score)
 
 
 if __name__ == '__main__':

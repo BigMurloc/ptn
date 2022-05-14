@@ -18,3 +18,22 @@ class TopicRepository:
     def delete(self, room_id):
         self.db_cursor.execute("DELETE FROM topic WHERE room_id = ?", (room_id,))
         self.db_connection.commit()
+
+    def vote(self, room_id, vote):
+        self.db_cursor.execute("SELECT score FROM topic WHERE room_id = ?", (room_id,))
+
+        row = self.db_cursor.fetchone()
+        if row is None:
+            raise RuntimeError('Room has no topic set')
+
+        score = row[0]
+        score += vote
+
+        self.db_cursor.execute(
+            "UPDATE topic "
+            "SET score = ? "
+            "WHERE room_id = ?",
+            (score, room_id)
+        )
+
+        self.db_connection.commit()
