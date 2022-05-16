@@ -5,6 +5,7 @@ from room.repository.room_repository import RoomRepository
 from room.repository.topic_repository import TopicRepository
 from room.room_service import RoomService
 from room.topic_service import TopicService
+from server import run
 from user.repository.user_repository import UserRepository
 from user.user_service import UserService
 from util.database import get_database, init_db
@@ -43,6 +44,11 @@ def user(obj, username, password):
         UserRepository(obj['db']),
         PasswordManager()
     ).login(username, password)
+
+
+@cli.command("run-as-server", help="Runs program as api server")
+def run_as_server():
+    run()
 
 
 # ----------------------USER-------------------
