@@ -1,16 +1,14 @@
 import uvicorn
 from starlette.applications import Starlette
-from starlette.responses import JSONResponse
-from starlette.routing import Route
+from starlette.routing import Mount
 
+from server.api.endpoints import routes as api_routes
 
-async def homepage(request):
-    return JSONResponse({'hello': 'world'})
+routes = [
+    Mount('/api', routes=api_routes, name='api')
+]
 
-
-app = Starlette(debug=True, routes=[
-    Route('/', homepage)
-])
+app = Starlette(debug=True, routes=routes)
 
 
 def run():

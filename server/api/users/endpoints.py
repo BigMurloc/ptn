@@ -1,12 +1,14 @@
-from starlette.applications import Starlette
+from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
 
-async def homepage(request):
-    return JSONResponse({'hello': 'world'})
+class Login(HTTPEndpoint):
+
+    async def get(self, request):
+        return JSONResponse({'login': 'dunno'})
 
 
-app = Starlette(debug=True, routes=[
-    Route('/', homepage)
-])
+routes = [
+    Route('/login', Login)
+]
