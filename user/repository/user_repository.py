@@ -1,6 +1,7 @@
 import sqlite3
-from sqlite3 import Connection
+from sqlite3 import Connection, IntegrityError
 
+from user.repository.exceptions import ExistingUser
 from user.repository.user_model import User
 
 
@@ -30,9 +31,12 @@ class UserRepository:
         return self.__user_tuple_mapper(self.db_cursor.fetchone())
 
     def save(self, username, password):
-        self.db_cursor.execute(
-            "INSERT INTO users (username, password) VALUES (?, ?)", (username, password)
-        )
+        try:
+            self.db_cursor.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)", (username, password)
+            )
+        except IntegrityError:
+            raise ExistingUser
 
         self.db_connection.commit()
 

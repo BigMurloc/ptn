@@ -1,9 +1,11 @@
 from getpass import getpass
 
+from user.exceptions import UserDataValidationError
 from user.repository.user_model import User
 from user.repository.user_repository import UserRepository
 from user.user_guard import UserGuard
 from user.user_state import UserState
+from util.database import get_database
 from util.password_manager import PasswordManager
 
 
@@ -21,6 +23,14 @@ class UserService:
     def register(self):
         username = self.__get_username()
         password = self.__get_password()
+
+        hashed_password = self.password_manager.hash_password(password)
+
+        self.repository.save(username, self.password_manager.decode(hashed_password))
+
+    def register(self, username, password):
+        if not (self.user_guard.verify_username(username) or self.user_guard.check_password_strength(password)):
+            raise UserDataValidationError
 
         hashed_password = self.password_manager.hash_password(password)
 
@@ -61,3 +71,12 @@ class UserService:
         while self.user_guard.check_password_strength(password) is not True:
             password = getpass()
         return password
+
+
+def get_user_service():
+    return UserService(
+        UserRepository(
+            get_database()
+        ),
+        PasswordManager()
+    )

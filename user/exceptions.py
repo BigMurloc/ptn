@@ -1,0 +1,2 @@
+class UserDataValidationError(Exception):
+    pass

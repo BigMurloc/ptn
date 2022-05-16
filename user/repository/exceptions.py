@@ -1,0 +1,2 @@
+class ExistingUser(Exception):
+    pass
