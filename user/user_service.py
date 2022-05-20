@@ -1,6 +1,6 @@
 from getpass import getpass
 
-from user.exceptions import UserDataValidationError
+from user.exceptions import UserDataValidationError, AuthenticationError
 from user.repository.user_model import User
 from user.repository.user_repository import UserRepository
 from user.user_guard import UserGuard
@@ -44,7 +44,7 @@ class UserService:
             UserState().user = user
         else:
             UserState().is_logged_in = False
-            raise RuntimeError('Login failure')
+            raise AuthenticationError('Login failure')
 
     def list_all(self, user_filter):
         UserState().is_authenticated()
