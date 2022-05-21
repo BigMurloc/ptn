@@ -16,10 +16,6 @@ class UserGuard:
             print("Username contains invalid characters, please try again")
             return False
 
-        if self.repository.is_username_unique(username) is False:
-            print("Username is already taken")
-            return False
-
         return True
 
     def check_password_strength(self, password):

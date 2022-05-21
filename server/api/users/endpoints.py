@@ -28,7 +28,7 @@ class Login(HTTPEndpoint):
             return JSONResponse({'error': 'missing_attributes'}, status_code=400)
         except AuthenticationError:
             return JSONResponse({}, status_code=401)
-        expiry = datetime.datetime.now() + datetime.timedelta(minutes=15)
+        expiry = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(minutes=15)
 
         token = jwt.encode({'exp': expiry, 'sub': UserState().user.id}, 'secret',
                            algorithm='HS256')
@@ -49,7 +49,7 @@ class Refresh(HTTPEndpoint):
 
         print(decoded_token)
 
-        expiry = datetime.datetime.now() + datetime.timedelta(minutes=15)
+        expiry = datetime.datetime.now(tz=datetime.timezone.utc) + datetime.timedelta(minutes=15)
 
         new_token = jwt.encode({'exp': expiry, 'sub': decoded_token.get('sub')},
                                'secret',
