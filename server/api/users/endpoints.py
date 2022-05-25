@@ -1,6 +1,6 @@
 import datetime
 
-from jwt import ExpiredSignatureError
+from starlette.authentication import requires
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 from starlette.routing import Route
@@ -37,21 +37,15 @@ class Login(HTTPEndpoint):
 
 class Refresh(HTTPEndpoint):
 
+    @requires('authenticated')
     async def post(self, request):
-        if request.headers.get('authorization') is None:
-            return JSONResponse({'error': 'authorization_header_required'}, status_code=400)
-
-        token = request.headers.get('authorization')[4:]
-        try:
-            decoded_token = jwt.decode(token, 'secret', algorithms='HS256')
-        except ExpiredSignatureError:
+        if not request.user.is_authenticated:
             return JSONResponse({}, status_code=403)
-
-        print(decoded_token)
 
         expiry = datetime.datetime.now() + datetime.timedelta(minutes=15)
 
-        new_token = jwt.encode({'exp': expiry, 'sub': decoded_token.get('sub')},
+        print(request.user.display_name)
+        new_token = jwt.encode({'exp': expiry, 'sub': request.user.display_name},
                                'secret',
                                algorithm='HS256')
         return JSONResponse({'token': new_token})
