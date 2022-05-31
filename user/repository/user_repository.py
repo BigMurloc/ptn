@@ -11,8 +11,11 @@ class UserRepository:
         self.db_connection = db_connection
         self.db_cursor = db_connection.cursor()
 
-    def find_all(self):
-        self.db_cursor.execute("SELECT * FROM users")
+    def find_all(self, user_filter):
+        if user_filter is None:
+            user_filter = ''
+
+        self.db_cursor.execute("SELECT * FROM users WHERE username like ?", (user_filter + '%', ))
 
         user_tuples = self.db_cursor.fetchall()
         users = []

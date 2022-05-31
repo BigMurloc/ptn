@@ -1,7 +1,6 @@
 from getpass import getpass
 
 from user.exceptions import UserDataValidationError, AuthenticationError
-from user.repository.user_model import User
 from user.repository.user_repository import UserRepository
 from user.user_guard import UserGuard
 from user.user_state import UserState
@@ -47,13 +46,20 @@ class UserService:
             raise AuthenticationError('Login failure')
 
     def list_all(self, user_filter):
-        UserState().is_authenticated()
-
-        users = self.repository.find_all()
+        users = self.repository.find_all(user_filter)
 
         for user in users:
-            if user_filter is None or user_filter in user.user:
-                print(user.username)
+            print(user.username)
+
+    def find_usernames_by_username_like(self, user_filter):
+        users = self.repository.find_all(user_filter)
+
+        usernames = []
+
+        for user in users:
+            usernames.append({'username': user.username})
+
+        return usernames
 
     def delete(self, username):
         UserState().is_authenticated()

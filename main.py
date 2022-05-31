@@ -8,6 +8,7 @@ from room.topic_service import TopicService
 from server import run
 from user.repository.user_repository import UserRepository
 from user.user_service import UserService
+from user.user_state import UserState
 from util.database import get_database, init_db
 from util.password_manager import PasswordManager
 
@@ -58,6 +59,8 @@ def run_as_server():
 @click.option("--filter")
 @click.pass_obj
 def list_all(obj, filter):
+    UserState().is_authenticated()
+
     UserService(
         UserRepository(obj['db']),
         PasswordManager()
