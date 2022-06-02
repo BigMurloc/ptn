@@ -78,7 +78,7 @@ class List(HTTPEndpoint):
         return JSONResponse(usernames)
 
 
-routes = [
+user_routes = [
     Route('/login', Login),
     Route('/register', Register),
     Route('/refresh', Refresh),

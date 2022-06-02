@@ -7,7 +7,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Mount
 
-from server.api.endpoints import routes as api_routes
+from server.api.endpoints import api_routes
 
 
 class BasicAuthBackend(AuthenticationBackend):

@@ -4,6 +4,7 @@ from room.repository.participant_repository import ParticipantRepository
 from room.repository.room_model import Room
 from room.repository.room_repository import RoomRepository
 from user.user_state import UserState
+from util.database import get_database
 from util.password_manager import PasswordManager
 
 
@@ -27,6 +28,9 @@ class RoomService:
         hashed_password = self.password_manager.hash_password(password)
 
         self.room_repository.save(UserState().user.id, self.password_manager.decode(hashed_password))
+
+    def find_user_rooms(self, user_id):
+        return self.room_repository.find_by_user_id(user_id)
 
     def join(self, room_id, password):
         print('Entering room...')
@@ -58,3 +62,19 @@ class RoomService:
 
     def set_active_topic(self, topic_id, room_id):
         self.room_repository.set_active_topic(topic_id, room_id)
+
+
+def get_room_service():
+    db_conn = get_database()
+    return RoomService(
+        RoomRepository(
+            ParticipantRepository(
+                db_conn
+            ),
+            db_conn
+        ),
+        ParticipantRepository(
+            db_conn
+        ),
+        PasswordManager()
+    )
