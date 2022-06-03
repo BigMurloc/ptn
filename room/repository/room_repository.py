@@ -14,8 +14,8 @@ class RoomRepository:
         self.db_connection = db_connection
         self.db_cursor = db_connection.cursor()
 
-    def save(self, owner_id, password):
-        self.db_cursor.execute("INSERT INTO room (owner, password) VALUES (?, ?)", (owner_id, password))
+    def save(self, owner_id, name, password):
+        self.db_cursor.execute("INSERT INTO room (owner, name, password) VALUES (?, ?, ?)", (owner_id, name, password))
         self.db_connection.commit()
 
     def find_by_id(self, room_id):
@@ -55,7 +55,7 @@ class RoomRepository:
         self.db_connection.commit()
 
     def __room_tuple_mapper(self, room_tuple):
-        return Room(room_tuple[0], room_tuple[1], room_tuple[2])
+        return Room(room_tuple[0], room_tuple[1], room_tuple[2], room_tuple[3])
 
     def __user_room_tuple_mapper_to_json_object(self, user_room_tuple):
         return {'name': user_room_tuple[0], 'id': user_room_tuple[1], 'owner': user_room_tuple[2]}

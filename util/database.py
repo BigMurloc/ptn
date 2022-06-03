@@ -36,6 +36,7 @@ def init_db(connection: Connection):
         "CREATE TABLE room ( "
         "id INTEGER PRIMARY KEY, "
         "owner INTEGER NOT NULL, "
+        "name TEXT NOT NULL, "
         "password TEXT NOT NULL, "
         "active_topic INTEGER, "
         "FOREIGN KEY (owner) REFERENCES users(id), "
@@ -60,7 +61,8 @@ def init_db(connection: Connection):
         "user_id INTEGER NOT NULL, "
         "room_id INTEGER NOT NULL, "
         "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, "
-        "FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE CASCADE "
+        "FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE CASCADE, "
+        "UNIQUE (user_id, room_id) "
         ") "
     )
 

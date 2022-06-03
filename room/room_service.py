@@ -20,14 +20,21 @@ class RoomService:
         self.participant_repository = participant_repository
         self.password_manager = password_manager
 
-    def create(self):
+    def create(self, command):
         UserState().is_authenticated()
 
-        print('Creating room...')
-        password = getpass('Enter room password: ')
-        hashed_password = self.password_manager.hash_password(password)
+        if command is None:
+            print('Creating room...')
+            name = input('Enter name of the room: ')
+            password = getpass('Enter room password: ')
+            hashed_password = self.password_manager.hash_password(password)
+            self.room_repository.save(UserState().user.id, name, self.password_manager.decode(hashed_password))
+            return
 
-        self.room_repository.save(UserState().user.id, self.password_manager.decode(hashed_password))
+        hashed_password = self.password_manager.hash_password(command.password)
+        decoded_password = self.password_manager.decode(hashed_password)
+
+        self.room_repository.save(UserState().user.id, command.name, decoded_password)
 
     def find_user_rooms(self, user_id):
         return self.room_repository.find_by_user_id(user_id)
