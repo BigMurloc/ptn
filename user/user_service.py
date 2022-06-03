@@ -28,7 +28,7 @@ class UserService:
         self.repository.save(username, self.password_manager.decode(hashed_password))
 
     def register(self, username, password):
-        if not (self.user_guard.verify_username(username) or self.user_guard.check_password_strength(password)):
+        if not self.user_guard.verify_username(username) or not self.user_guard.check_password_strength(password):
             raise UserDataValidationError
 
         hashed_password = self.password_manager.hash_password(password)

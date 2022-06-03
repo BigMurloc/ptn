@@ -2,6 +2,8 @@ import jwt
 import uvicorn
 from jwt import ExpiredSignatureError
 from starlette.applications import Starlette
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.authentication import AuthenticationBackend, AuthenticationError, SimpleUser, AuthCredentials
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
@@ -32,7 +34,9 @@ routes = [
 ]
 
 middleware = [
-    Middleware(AuthenticationMiddleware, backend=BasicAuthBackend())
+    Middleware(AuthenticationMiddleware, backend=BasicAuthBackend()),
+    Middleware(TrustedHostMiddleware, allowed_hosts=['*']),
+    Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']),
 ]
 
 app = Starlette(debug=True, routes=routes, middleware=middleware)
