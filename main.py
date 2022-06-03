@@ -120,7 +120,7 @@ def room(obj, room_id, room_password):
         ),
         participant_repository,
         PasswordManager()
-    ).join(room_id, room_password)
+    ).join(UserState().user.id, room_id, room_password)
 
 
 # ----------------------ROOM------------------

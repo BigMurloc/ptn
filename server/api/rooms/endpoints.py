@@ -6,6 +6,7 @@ from starlette.routing import Route
 
 from room.room_service import get_room_service
 from server.api.rooms.dto.room_create_command import RoomCreateCommand
+from server.api.rooms.dto.room_join_command import RoomJoinCommand
 
 
 class My(HTTPEndpoint):
@@ -33,7 +34,26 @@ class Create(HTTPEndpoint):
         return JSONResponse({}, status_code=201)
 
 
+class Join(HTTPEndpoint):
+
+    @requires('authenticated')
+    async def post(self, request):
+        room_id = request.path_params.get('id')
+        body = await request.json()
+
+        try:
+            command = RoomJoinCommand(**body)
+        except ValidationError:
+            return JSONResponse('some fields are missing', status_code=400)
+
+        service = get_room_service()
+        service.join(request.user.display_name, room_id, command.password)
+
+        return JSONResponse({})
+
+
 rooms_routes = [
     Route('/my', My),
-    Route('/create', Create)
+    Route('/create', Create),
+    Route('/{id}/join', Join)
 ]

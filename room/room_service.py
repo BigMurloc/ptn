@@ -39,12 +39,12 @@ class RoomService:
     def find_user_rooms(self, user_id):
         return self.room_repository.find_by_user_id(user_id)
 
-    def join(self, room_id, password):
+    def join(self, user_id, room_id, password):
         print('Entering room...')
         room: Room = self.room_repository.find_by_id(room_id)
 
         if self.password_manager.verify_password(password, room.password):
-            self.participant_repository.save(UserState().user.id, room.id)
+            self.participant_repository.save(user_id, room.id)
             print(f'Successfully entered the room with id {room.id}')
         else:
             raise RuntimeError('Password did not match')
