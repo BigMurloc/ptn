@@ -52,8 +52,18 @@ class Join(HTTPEndpoint):
         return JSONResponse({})
 
 
+class Get(HTTPEndpoint):
+
+    @requires('authenticated')
+    async def get(self, request):
+        service = get_room_service()
+        summary = service.room_summary(request.path_params.get('id'))
+        return JSONResponse(summary)
+
+
 rooms_routes = [
     Route('/my', My),
     Route('/create', Create),
-    Route('/{id}/join', Join)
+    Route('/{id}/join', Join),
+    Route('/{id}', Get)
 ]

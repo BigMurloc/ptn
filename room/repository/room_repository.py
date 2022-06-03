@@ -22,6 +22,32 @@ class RoomRepository:
         self.db_cursor.execute("SELECT * FROM room WHERE id = ? ", (room_id,))
         return self.__room_tuple_mapper(self.db_cursor.fetchone())
 
+    def find_summary(self, room_id):
+        self.db_cursor.execute("SELECT u.username, r.id, r.active_topic "
+                               "FROM room r "
+                               "JOIN users u on r.owner = u.id "
+                               "WHERE r.id = ? ", (room_id,))
+        user_room_tuple = self.db_cursor.fetchone()
+
+        self.db_cursor.execute("SELECT u.username "
+                               "FROM participant p "
+                               "JOIN users u on p.user_id = u.id "
+                               "WHERE p.room_id = ?", (room_id,))
+
+        room_participants_tuples = self.db_cursor.fetchall()
+
+        participants = []
+
+        for room_participant_tuple in room_participants_tuples:
+            participants.append({'username':  room_participant_tuple[0]})
+
+        return {
+            'name': user_room_tuple[0],
+            'id': user_room_tuple[1],
+            'active_topic': user_room_tuple[2],
+            'users': participants
+        }
+
     def find_by_user_id(self, user_id):
         self.db_cursor.execute(""
                                "SELECT u1.username, r1.id, u1.username "

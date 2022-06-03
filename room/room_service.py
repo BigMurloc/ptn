@@ -49,6 +49,9 @@ class RoomService:
         else:
             raise RuntimeError('Password did not match')
 
+    def room_summary(self, room_id):
+        return self.room_repository.find_summary(room_id)
+
     def delete(self, room_id):
         UserState().is_authenticated()
 
