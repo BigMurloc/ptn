@@ -71,6 +71,12 @@ class RoomRepository:
 
         return user_rooms
 
+    def is_participant(self, room_id, user_id):
+        self.db_cursor.execute("SELECT count(user_id) "
+                               "FROM participant "
+                               "WHERE room_id = ? AND user_id = ?", (room_id, user_id))
+        return self.db_cursor.fetchone()[0] > 0
+
     def delete_by_id(self, room_id):
         self.db_cursor.execute("DELETE FROM room WHERE id = ? ", (room_id,))
         self.db_connection.commit()

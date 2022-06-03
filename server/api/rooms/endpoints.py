@@ -57,7 +57,13 @@ class Get(HTTPEndpoint):
     @requires('authenticated')
     async def get(self, request):
         service = get_room_service()
-        summary = service.room_summary(request.path_params.get('id'))
+
+        room_id = request.path_params.get('id')
+        user_id = request.user.display_name
+        if not service.is_participant(room_id, user_id):
+            return JSONResponse({}, status_code=404)
+
+        summary = service.room_summary(room_id)
         return JSONResponse(summary)
 
 
