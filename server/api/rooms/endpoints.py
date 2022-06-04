@@ -66,7 +66,7 @@ class Room(HTTPEndpoint):
 
         room_id = request.path_params.get('id')
         user_id = request.user.display_name
-        if not service.is_participant(room_id, user_id) and not service.is_owner(room_id, user_id):
+        if not service.is_participant(room_id, user_id):
             return JSONResponse({'error': 'not participant'}, status_code=403)
 
         summary = service.room_summary(room_id)

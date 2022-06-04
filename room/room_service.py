@@ -93,7 +93,7 @@ class RoomService:
         return room.owner == user_id
 
     def is_participant(self, room_id, user_id):
-        return self.room_repository.is_participant(room_id, user_id)
+        return self.room_repository.is_participant(room_id, user_id) or self.is_owner(room_id, user_id)
 
     def set_active_topic(self, topic_id, room_id):
         self.room_repository.set_active_topic(topic_id, room_id)
