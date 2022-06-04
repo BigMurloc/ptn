@@ -18,13 +18,19 @@ class RoomRepository:
         self.db_cursor.execute("INSERT INTO room (owner, name, password) VALUES (?, ?, ?)", (owner_id, name, password))
         self.db_connection.commit()
 
+        room_id = self.db_cursor.execute("SELECT id FROM room WHERE owner = ? AND name = ? ", (owner_id, name)).fetchone()[0]
+        self.db_cursor.execute("INSERT INTO participant (user_id, room_id) "
+                               "VALUES (?, ?)", (owner_id, room_id))
+        self.db_connection.commit()
+
     def find_by_id(self, room_id):
         self.db_cursor.execute("SELECT * FROM room WHERE id = ? ", (room_id,))
         return self.__room_tuple_mapper(self.db_cursor.fetchone())
 
     def find_summary(self, room_id):
-        self.db_cursor.execute("SELECT u.username, r.id, r.active_topic "
+        self.db_cursor.execute("SELECT u.username, r.id, t.name "
                                "FROM room r "
+                               "LEFT JOIN topic t on t.id = r.active_topic "
                                "JOIN users u on r.owner = u.id "
                                "WHERE r.id = ? ", (room_id,))
         user_room_tuple = self.db_cursor.fetchone()
@@ -44,7 +50,7 @@ class RoomRepository:
         return {
             'name': user_room_tuple[0],
             'id': user_room_tuple[1],
-            'active_topic': user_room_tuple[2],
+            'topic': user_room_tuple[2],
             'users': participants
         }
 
