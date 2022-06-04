@@ -90,7 +90,7 @@ class RoomRepository:
 
         return user_rooms
 
-    def patch_room(self, room_id, topic_id, password):
+    def patch_room(self, room_id, topic, password):
 
         if password is not None:
             self.db_cursor.execute(""
@@ -98,11 +98,23 @@ class RoomRepository:
                                    "SET password = ? "
                                    "WHERE id = ? ", (password, room_id))
 
-        if topic_id is not None:
+        if topic is not None:
+
+            self.db_cursor.execute("INSERT INTO topic(room_id, name, description) "
+                                   "VALUES (?, ?, '') "
+                                   "ON CONFLICT (room_id) DO UPDATE SET name = ? ", (room_id, topic, topic))
+
+            self.db_connection.commit()
+
+            topic_id = self.db_cursor.execute("SELECT id "
+                                              "FROM topic "
+                                              "WHERE name = ? AND room_id = ?", (topic, room_id)).fetchone()[0]
+
             self.db_cursor.execute(""
                                    "UPDATE room "
                                    "SET active_topic = ? "
                                    "WHERE id = ? ", (topic_id, room_id))
+
             self.db_connection.execute(""
                                        "UPDATE vote "
                                        "SET vote = 0 "
