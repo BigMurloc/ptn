@@ -7,6 +7,7 @@ from starlette.routing import Route
 from room.room_service import get_room_service
 from server.api.rooms.dto.room_create_command import RoomCreateCommand
 from server.api.rooms.dto.room_join_command import RoomJoinCommand
+from server.api.rooms.dto.room_patch_command import RoomPatchCommand
 
 
 class My(HTTPEndpoint):
@@ -52,7 +53,7 @@ class Join(HTTPEndpoint):
         return JSONResponse({})
 
 
-class Get(HTTPEndpoint):
+class Room(HTTPEndpoint):
 
     @requires('authenticated')
     async def get(self, request):
@@ -66,10 +67,29 @@ class Get(HTTPEndpoint):
         summary = service.room_summary(room_id)
         return JSONResponse(summary)
 
+    @requires('authenticated')
+    async def patch(self, request):
+
+        service = get_room_service()
+        room_id = request.path_params.get('id')
+        user_id = request.user.display_name
+
+        if not service.is_owner(room_id, user_id):
+            return JSONResponse({}, status_code=404)
+
+        body = await request.json()
+
+        command = RoomPatchCommand(**body)
+
+        service.patch_room(room_id, command.topic, command.password)
+        summary = service.room_summary(room_id)
+
+        return JSONResponse(summary)
+
 
 rooms_routes = [
     Route('/my', My),
     Route('/create', Create),
     Route('/{id}/join', Join),
-    Route('/{id}', Get)
+    Route('/{id}', Room)
 ]
