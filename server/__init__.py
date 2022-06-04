@@ -12,7 +12,7 @@ from starlette.routing import Mount
 from server.api.endpoints import api_routes
 
 
-class BasicAuthBackend(AuthenticationBackend):
+class JWTAuthBackend(AuthenticationBackend):
     async def authenticate(self, conn):
         if "authorization" not in conn.headers:
             return
@@ -34,7 +34,7 @@ routes = [
 ]
 
 middleware = [
-    Middleware(AuthenticationMiddleware, backend=BasicAuthBackend()),
+    Middleware(AuthenticationMiddleware, backend=JWTAuthBackend()),
     Middleware(TrustedHostMiddleware, allowed_hosts=['*']),
     Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*']),
 ]
