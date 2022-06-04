@@ -21,6 +21,7 @@ def init_db(connection: Connection):
     cursor.execute("DROP TABLE IF EXISTS room")
     cursor.execute("DROP TABLE IF EXISTS participant")
     cursor.execute("DROP TABLE IF EXISTS topic")
+    cursor.execute("DROP TABLE IF EXISTS vote")
 
     connection.commit()
 
@@ -50,7 +51,6 @@ def init_db(connection: Connection):
         "room_id INTEGER REFERENCES room(id), "
         "name TEXT, "
         "description TEXT, "
-        "score INTEGER DEFAULT 0, "
         "UNIQUE(room_id) "
         ") "
     )
@@ -63,6 +63,17 @@ def init_db(connection: Connection):
         "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, "
         "FOREIGN KEY (room_id) REFERENCES room(id) ON DELETE CASCADE, "
         "UNIQUE (user_id, room_id) "
+        ") "
+    )
+
+    cursor.execute(
+        "CREATE TABLE vote ( "
+        "user_id INTEGER NOT NULL, "
+        "topic_id INTEGER NOT NULL, "
+        "vote INTEGER NOT NULL CHECK ( vote IN (-2, -1, 0, 0.5, 1, 2, 3, 5, 8, 13, 20, 50, 100, 200) ), "
+        "PRIMARY KEY (user_id, topic_id), "
+        "FOREIGN KEY (user_id) REFERENCES users(id), "
+        "FOREIGN KEY (topic_id) REFERENCES topic(id) "
         ") "
     )
 

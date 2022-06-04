@@ -73,6 +73,9 @@ class RoomService:
         else:
             raise RuntimeError('You are not owner of this room')
 
+    def vote(self, room_id, user_id, score):
+        self.room_repository.vote(room_id, user_id, score)
+
     def is_owner(self, room_id, user_id=None):
         room: Room = self.room_repository.find_by_id(room_id)
 

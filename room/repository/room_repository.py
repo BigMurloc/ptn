@@ -39,7 +39,7 @@ class RoomRepository:
         participants = []
 
         for room_participant_tuple in room_participants_tuples:
-            participants.append({'username':  room_participant_tuple[0]})
+            participants.append({'username': room_participant_tuple[0]})
 
         return {
             'name': user_room_tuple[0],
@@ -47,6 +47,25 @@ class RoomRepository:
             'active_topic': user_room_tuple[2],
             'users': participants
         }
+
+    def __active_topic(self, room_id):
+        self.db_cursor.execute("SELECT active_topic FROM room WHERE id = ?", (room_id,))
+        return self.db_cursor.fetchone()[0]
+
+    def vote(self, room_id, user_id, score):
+
+        active_topic = self.__active_topic(room_id)
+
+        print('topic', active_topic, score)
+
+        self.db_cursor.execute(""
+                               "INSERT INTO vote(user_id, topic_id, vote) "
+                               "VALUES (?, ?, ?) "
+                               "ON CONFLICT (user_id, topic_id) DO UPDATE SET vote = ? ",
+                               (user_id, active_topic, score, score)
+                               )
+
+        self.db_connection.commit()
 
     def find_by_user_id(self, user_id):
         self.db_cursor.execute(""
@@ -85,9 +104,9 @@ class RoomRepository:
                                    "SET active_topic = ? "
                                    "WHERE id = ? ", (topic_id, room_id))
             self.db_connection.execute(""
-                                       "UPDATE topic "
-                                       "SET score = 0 "
-                                       "WHERE id = ? and room_id = ?", (topic_id, room_id))
+                                       "UPDATE vote "
+                                       "SET vote = 0 "
+                                       "WHERE topic_id = ? ", (topic_id,))
 
         self.db_connection.commit()
 

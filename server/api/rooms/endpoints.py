@@ -8,6 +8,7 @@ from room.room_service import get_room_service
 from server.api.rooms.dto.room_create_command import RoomCreateCommand
 from server.api.rooms.dto.room_join_command import RoomJoinCommand
 from server.api.rooms.dto.room_patch_command import RoomPatchCommand
+from server.api.rooms.dto.room_vote_command import RoomVoteCommand
 
 
 class My(HTTPEndpoint):
@@ -87,9 +88,30 @@ class Room(HTTPEndpoint):
         return JSONResponse(summary)
 
 
+class Vote(HTTPEndpoint):
+
+    @requires('authenticated')
+    async def put(self, request):
+
+        service = get_room_service()
+        room_id = request.path_params.get('id')
+        user_id = request.user.display_name
+
+        if not service.is_participant(room_id, user_id):
+            return JSONResponse({}, status_code=404)
+
+        body = await request.json()
+        command = RoomVoteCommand(**body)
+
+        service.vote(room_id, user_id, command.vote)
+
+        return JSONResponse({})
+
+
 rooms_routes = [
     Route('/my', My),
     Route('/create', Create),
     Route('/{id}/join', Join),
-    Route('/{id}', Room)
+    Route('/{id}', Room),
+    Route('/{id}/vote', Vote)
 ]
