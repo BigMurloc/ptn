@@ -81,7 +81,7 @@ class Room(HTTPEndpoint):
 
         command = RoomPatchCommand(**body)
 
-        service.patch_room(room_id, command.topic, command.password)
+        service.patch_room(room_id, command.topic_id, command.password)
         summary = service.room_summary(room_id)
 
         return JSONResponse(summary)

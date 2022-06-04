@@ -52,9 +52,13 @@ class RoomService:
     def room_summary(self, room_id):
         return self.room_repository.find_summary(room_id)
 
-    def patch_room(self, room_id, topic, password):
-        self.room_repository.patch_room(room_id, topic, password)
+    def patch_room(self, room_id, topic_id, password):
 
+        if password is not None:
+            hashed_password = self.password_manager.hash_password(password)
+            password = self.password_manager.decode(hashed_password)
+
+        self.room_repository.patch_room(room_id, topic_id, password)
 
     def delete(self, room_id):
         UserState().is_authenticated()

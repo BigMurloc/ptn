@@ -71,7 +71,7 @@ class RoomRepository:
 
         return user_rooms
 
-    def patch_room(self, room_id, topic, password):
+    def patch_room(self, room_id, topic_id, password):
 
         if password is not None:
             self.db_cursor.execute(""
@@ -79,11 +79,15 @@ class RoomRepository:
                                    "SET password = ? "
                                    "WHERE id = ? ", (password, room_id))
 
-        if topic is not None:
+        if topic_id is not None:
             self.db_cursor.execute(""
-                                   "UPDATE topic "
-                                   "SET name = ?, score = 0 "
-                                   "WHERE room_id = ? ", (topic, room_id))
+                                   "UPDATE room "
+                                   "SET active_topic = ? "
+                                   "WHERE id = ? ", (topic_id, room_id))
+            self.db_connection.execute(""
+                                       "UPDATE topic "
+                                       "SET score = 0 "
+                                       "WHERE id = ? and room_id = ?", (topic_id, room_id))
 
         self.db_connection.commit()
 
