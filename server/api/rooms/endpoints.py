@@ -29,7 +29,7 @@ class Create(HTTPEndpoint):
         try:
             command = RoomCreateCommand(**body)
         except ValidationError:
-            return JSONResponse('some fields are missing', status_code=400)
+            return JSONResponse({}, status_code=400)
 
         service = get_room_service()
         service.create(command)
@@ -47,7 +47,7 @@ class Join(HTTPEndpoint):
         try:
             command = RoomJoinCommand(**body)
         except ValidationError:
-            return JSONResponse('some fields are missing', status_code=400)
+            return JSONResponse({}, status_code=400)
 
         service = get_room_service()
         try:
@@ -67,7 +67,7 @@ class Room(HTTPEndpoint):
         room_id = request.path_params.get('id')
         user_id = request.user.display_name
         if not service.is_participant(room_id, user_id):
-            return JSONResponse({}, status_code=403)
+            return JSONResponse({'error': 'not participant'}, status_code=403)
 
         summary = service.room_summary(room_id)
         return JSONResponse(summary)
@@ -80,7 +80,7 @@ class Room(HTTPEndpoint):
         user_id = request.user.display_name
 
         if not service.is_owner(room_id, user_id):
-            return JSONResponse({}, status_code=403)
+            return JSONResponse({'error': 'not owner'}, status_code=403)
 
         body = await request.json()
 
@@ -102,7 +102,7 @@ class Vote(HTTPEndpoint):
         room_id = request.path_params.get('id')
 
         if not service.is_participant(room_id, user_id):
-            return JSONResponse({}, status_code=403)
+            return JSONResponse({'error': 'not participant'}, status_code=403)
 
         room_votes = service.get_votes(room_id)
 
@@ -116,7 +116,7 @@ class Vote(HTTPEndpoint):
         user_id = request.user.display_name
 
         if not service.is_participant(room_id, user_id):
-            return JSONResponse({}, status_code=403)
+            return JSONResponse({'error': 'not participant'}, status_code=403)
 
         body = await request.json()
         try:
