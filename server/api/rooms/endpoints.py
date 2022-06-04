@@ -100,7 +100,9 @@ class Vote(HTTPEndpoint):
         if not service.is_participant(room_id, user_id):
             return JSONResponse({}, status_code=403)
 
-        return JSONResponse({})
+        room_votes = service.get_votes(room_id)
+
+        return JSONResponse({'votes': room_votes})
 
     @requires('authenticated')
     async def put(self, request):

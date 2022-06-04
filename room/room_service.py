@@ -76,6 +76,9 @@ class RoomService:
     def vote(self, room_id, user_id, score):
         self.room_repository.vote(room_id, user_id, score)
 
+    def get_votes(self, room_id):
+        return self.room_repository.get_votes(room_id)
+
     def is_owner(self, room_id, user_id=None):
         room: Room = self.room_repository.find_by_id(room_id)
 

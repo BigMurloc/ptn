@@ -110,6 +110,25 @@ class RoomRepository:
 
         self.db_connection.commit()
 
+    def get_votes(self, room_id):
+
+        active_topic = self.__active_topic(room_id)
+
+        self.db_cursor.execute(""
+                               "SELECT u.username, v.vote "
+                               "FROM vote v "
+                               "JOIN users u on v.user_id = u.id "
+                               "WHERE topic_id = ?",
+                               (active_topic,))
+
+        room_vote_tuples = self.db_cursor.fetchall()
+        room_votes = []
+
+        for room_vote_tuple in room_vote_tuples:
+            room_votes.append(self.__room_vote_tuples_mapper_to_json_object(room_vote_tuple))
+
+        return room_votes
+
     def is_participant(self, room_id, user_id):
         self.db_cursor.execute("SELECT count(user_id) "
                                "FROM participant "
@@ -130,3 +149,6 @@ class RoomRepository:
 
     def __user_room_tuple_mapper_to_json_object(self, user_room_tuple):
         return {'name': user_room_tuple[0], 'id': user_room_tuple[1], 'owner': user_room_tuple[2]}
+
+    def __room_vote_tuples_mapper_to_json_object(self, room_vote_tuple):
+        return {'username': room_vote_tuple[0], 'value': room_vote_tuple[1]}
