@@ -63,7 +63,7 @@ class Room(HTTPEndpoint):
         room_id = request.path_params.get('id')
         user_id = request.user.display_name
         if not service.is_participant(room_id, user_id):
-            return JSONResponse({}, status_code=404)
+            return JSONResponse({}, status_code=403)
 
         summary = service.room_summary(room_id)
         return JSONResponse(summary)
@@ -76,7 +76,7 @@ class Room(HTTPEndpoint):
         user_id = request.user.display_name
 
         if not service.is_owner(room_id, user_id):
-            return JSONResponse({}, status_code=404)
+            return JSONResponse({}, status_code=403)
 
         body = await request.json()
 
@@ -91,6 +91,18 @@ class Room(HTTPEndpoint):
 class Vote(HTTPEndpoint):
 
     @requires('authenticated')
+    async def get(self, request):
+
+        service = get_room_service()
+        user_id = request.user.display_name
+        room_id = request.path_params.get('id')
+
+        if not service.is_participant(room_id, user_id):
+            return JSONResponse({}, status_code=403)
+
+        return JSONResponse({})
+
+    @requires('authenticated')
     async def put(self, request):
 
         service = get_room_service()
@@ -98,10 +110,13 @@ class Vote(HTTPEndpoint):
         user_id = request.user.display_name
 
         if not service.is_participant(room_id, user_id):
-            return JSONResponse({}, status_code=404)
+            return JSONResponse({}, status_code=403)
 
         body = await request.json()
-        command = RoomVoteCommand(**body)
+        try:
+            command = RoomVoteCommand(**body)
+        except ValidationError:
+            return JSONResponse({}, status_code=400)
 
         service.vote(room_id, user_id, command.vote)
 
