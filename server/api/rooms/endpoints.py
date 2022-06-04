@@ -4,6 +4,7 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
+from room.exceptions import AlreadyJoinedRoomException
 from room.room_service import get_room_service
 from server.api.rooms.dto.room_create_command import RoomCreateCommand
 from server.api.rooms.dto.room_join_command import RoomJoinCommand
@@ -49,7 +50,10 @@ class Join(HTTPEndpoint):
             return JSONResponse('some fields are missing', status_code=400)
 
         service = get_room_service()
-        service.join(request.user.display_name, room_id, command.password)
+        try:
+            service.join(request.user.display_name, room_id, command.password)
+        except AlreadyJoinedRoomException:
+            return JSONResponse({'error': 'already joined'}, status_code=409)
 
         return JSONResponse({})
 

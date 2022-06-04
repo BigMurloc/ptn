@@ -63,7 +63,7 @@ class Register(HTTPEndpoint):
         except UserDataValidationError:
             return JSONResponse({'error': 'wrong_data'}, status_code=400)
         except ExistingUser:
-            return JSONResponse({'error': 'existing_user'}, status_code=400)
+            return JSONResponse({'error': 'existing_user'}, status_code=409)
 
         return JSONResponse({})
 

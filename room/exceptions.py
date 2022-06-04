@@ -1,0 +1,2 @@
+class AlreadyJoinedRoomException(Exception):
+    pass

@@ -1,5 +1,7 @@
 from getpass import getpass
+from sqlite3 import IntegrityError
 
+from room.exceptions import AlreadyJoinedRoomException
 from room.repository.participant_repository import ParticipantRepository
 from room.repository.room_model import Room
 from room.repository.room_repository import RoomRepository
@@ -44,8 +46,11 @@ class RoomService:
         room: Room = self.room_repository.find_by_id(room_id)
 
         if self.password_manager.verify_password(password, room.password):
-            self.participant_repository.save(user_id, room.id)
-            print(f'Successfully entered the room with id {room.id}')
+            try:
+                self.participant_repository.save(user_id, room.id)
+                print(f'Successfully entered the room with id {room.id}')
+            except IntegrityError:
+                raise AlreadyJoinedRoomException
         else:
             raise RuntimeError('Password did not match')
 
