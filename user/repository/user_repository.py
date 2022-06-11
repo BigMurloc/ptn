@@ -1,8 +1,11 @@
-import sqlite3
-from sqlite3 import Connection, IntegrityError
+from sqlite3 import Connection
 
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+
+from user.repository.UserDB import UserDB
 from user.repository.exceptions import ExistingUser
-from user.repository.user_model import User
+from util.database import get_database_orm
 
 
 class UserRepository:
@@ -11,45 +14,35 @@ class UserRepository:
         self.db_connection = db_connection
         self.db_cursor = db_connection.cursor()
 
-    def find_all(self, user_filter):
+    async def find_all(self, user_filter):
         if user_filter is None:
             user_filter = ''
 
-        self.db_cursor.execute("SELECT * FROM users WHERE username like ?", (user_filter + '%', ))
+        async with get_database_orm() as session:
+            return (await session.execute(
+                select(UserDB).where(UserDB.username.like(user_filter + '%'))
+            )).scalars()
 
-        user_tuples = self.db_cursor.fetchall()
-        users = []
+    async def find_by_username(self, username):
+        async with get_database_orm() as session:
+            return (await session.execute(
+                select(UserDB)
+                    .where(UserDB.username == username))).scalars().first()
 
-        for user_tuple in user_tuples:
-            users.append(self.__user_tuple_mapper(user_tuple))
-
-        return users
-
-    def find_by_username(self, username):
-        self.db_connection.row_factory = sqlite3.Row
-        self.db_cursor.execute(
-            "SELECT * FROM users WHERE username = ?", (username,)
-        )
-
-        return self.__user_tuple_mapper(self.db_cursor.fetchone())
-
-    def save(self, username, password):
+    async def save(self, username, password):
         try:
-            self.db_cursor.execute(
-                "INSERT INTO users (username, password) VALUES (?, ?)", (username, password)
-            )
+            async with get_database_orm() as session:
+                async with session.begin():
+                    user = UserDB(
+                        username=username,
+                        password=password
+                    )
+                    session.add(user)
+
         except IntegrityError:
             raise ExistingUser
-
-        self.db_connection.commit()
 
     def delete_by_username(self, username):
         self.db_cursor.execute("DELETE FROM users WHERE username = ?", (username,))
         self.db_connection.commit()
 
-    def is_username_unique(self, username):
-        self.db_cursor.execute("SELECT * FROM users WHERE username = ? ", (username,))
-        return self.db_cursor.fetchone() is None
-
-    def __user_tuple_mapper(self, user_tuple):
-        return User(user_tuple[0], user_tuple[1], user_tuple[2])

@@ -2,6 +2,33 @@ import sqlite3
 from os.path import exists
 from sqlite3 import Connection
 
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.util._compat_py3k import asynccontextmanager
+
+Base = declarative_base()
+engine = create_async_engine(
+            "sqlite+aiosqlite:///resources/roomies.db",
+            echo=True,
+            future=True
+        )
+
+@asynccontextmanager
+async def get_database_orm() -> AsyncSession:
+
+    global engine
+
+    if engine is None:
+        engine = create_async_engine(
+            "sqlite+aiosqlite://resources/roomies.db",
+            echo=True,
+            future=True
+        )
+    async with sessionmaker(
+            engine, expire_on_commit=False, class_=AsyncSession
+    )() as session:
+        yield session
+
 
 def get_database():
     db_path = "resources/roomies.db"

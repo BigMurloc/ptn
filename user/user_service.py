@@ -19,24 +19,24 @@ class UserService:
         self.user_guard = UserGuard(repository)
         self.password_manager = password_manager
 
-    def register(self):
+    async def register(self):
         username = self.__get_username()
         password = self.__get_password()
 
         hashed_password = self.password_manager.hash_password(password)
 
-        self.repository.save(username, self.password_manager.decode(hashed_password))
+        await self.repository.save(username, self.password_manager.decode(hashed_password))
 
-    def register(self, username, password):
+    async def register(self, username, password):
         if not self.user_guard.verify_username(username) or not self.user_guard.check_password_strength(password):
             raise UserDataValidationError
 
         hashed_password = self.password_manager.hash_password(password)
 
-        self.repository.save(username, self.password_manager.decode(hashed_password))
+        await self.repository.save(username, self.password_manager.decode(hashed_password))
 
-    def login(self, username, password):
-        user = self.repository.find_by_username(username)
+    async def login(self, username, password):
+        user = await self.repository.find_by_username(username)
         if self.password_manager.verify_password(password, user.password):
             print('Login success!')
             UserState().is_logged_in = True
@@ -45,14 +45,14 @@ class UserService:
             UserState().is_logged_in = False
             raise AuthenticationError('Login failure')
 
-    def list_all(self, user_filter):
-        users = self.repository.find_all(user_filter)
+    async def list_all(self, user_filter):
+        users = await self.repository.find_all(user_filter)
 
         for user in users:
             print(user.username)
 
-    def find_usernames_by_username_like(self, user_filter):
-        users = self.repository.find_all(user_filter)
+    async def find_usernames_by_username_like(self, user_filter):
+        users = await self.repository.find_all(user_filter)
 
         usernames = []
 

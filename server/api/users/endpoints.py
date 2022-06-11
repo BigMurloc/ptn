@@ -21,7 +21,7 @@ class Login(HTTPEndpoint):
         try:
             username = body['login']
             password = body['password']
-            service.login(username, password)
+            await service.login(username, password)
         except KeyError:
             return JSONResponse({'error': 'missing_attributes'}, status_code=400)
         except AuthenticationError:
@@ -57,7 +57,7 @@ class Register(HTTPEndpoint):
         try:
             username = body['login']
             password = body['password']
-            service.register(username, password)
+            await service.register(username, password)
         except KeyError:
             return JSONResponse({'error': 'missing_attributes'}, status_code=400)
         except UserDataValidationError:
@@ -73,7 +73,7 @@ class List(HTTPEndpoint):
     @requires('authenticated')
     async def get(self, request):
         service = get_user_service()
-        usernames = service.find_usernames_by_username_like(request.query_params.get('filter'))
+        usernames = await service.find_usernames_by_username_like(request.query_params.get('filter'))
         return JSONResponse(usernames)
 
 
