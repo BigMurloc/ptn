@@ -13,3 +13,4 @@ starlette~=0.20.0
 PyJWT~=2.4.0
 pydantic~=1.9.1
 SQLAlchemy~=1.4.37
+aiosqlite~=0.17.0
