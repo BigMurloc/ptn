@@ -1,3 +1,5 @@
+import os
+
 import click
 
 from room.repository.participant_repository import ParticipantRepository
@@ -11,6 +13,7 @@ from user.user_service import UserService
 from user.user_state import UserState
 from util.database import get_database, init_db
 from util.password_manager import PasswordManager
+
 
 
 @click.group()

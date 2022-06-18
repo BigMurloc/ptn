@@ -1,3 +1,5 @@
+import os
+
 import jwt
 import uvicorn
 from jwt import ExpiredSignatureError
@@ -11,6 +13,7 @@ from starlette.routing import Mount
 
 from server.api.endpoints import api_routes
 
+app_port = int(os.environ['PORT'])
 
 class JWTAuthBackend(AuthenticationBackend):
     async def authenticate(self, conn):
@@ -43,4 +46,4 @@ app = Starlette(debug=True, routes=routes, middleware=middleware)
 
 
 def run():
-    uvicorn.run("server:app", host="127.0.0.1", port=5000, log_level="info")
+    uvicorn.run("server:app", host="0.0.0.0", port=app_port, log_level="info")
